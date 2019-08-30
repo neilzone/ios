@@ -221,7 +221,6 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
                 itemsUpdate.append(item)
             }
             fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem.removeAll()
-            
         } else {
             for (_, item) in fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem {
                 itemsUpdate.append(item)
