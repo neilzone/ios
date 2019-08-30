@@ -242,9 +242,8 @@ extension FileProviderExtension {
                     }
                     let item = FileProviderItem(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier)
                     
-                    fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
                     fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-                    fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
+                    fileProviderData.sharedInstance.signalEnumerator(for: [.workingSet])
 
                     completionHandler(item, nil)
                     
@@ -253,9 +252,8 @@ extension FileProviderExtension {
                     fileProviderData.sharedInstance.listFavoriteIdentifierRank.removeValue(forKey: itemIdentifier.rawValue)
                     let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
                     
-                    fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
                     fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-                    fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
+                    fileProviderData.sharedInstance.signalEnumerator(for: [.workingSet])
                     
                     completionHandler(item, NSFileProviderError(.serverUnreachable))
                 }
