@@ -380,7 +380,7 @@
     
     // Registeration domain File Provider
     if (@available(iOS 11, *) ) {
-        //[FileProviderDomain.sharedInstance registerDomain];
+        [FileProviderDomain.sharedInstance registerDomain];
     }    
 }
 

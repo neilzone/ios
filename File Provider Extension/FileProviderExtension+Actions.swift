@@ -64,12 +64,7 @@ extension FileProviderExtension {
                 }
                 
                 let item = FileProviderItem(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier)
-                fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
-                fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-                fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
-              
                 completionHandler(item, nil)
-                
             } else {
                 completionHandler(nil, NSFileProviderError(.serverUnreachable))
             }
@@ -80,11 +75,6 @@ extension FileProviderExtension {
         
         guard let metadata = fileProviderUtility.sharedInstance.getTableMetadataFromItemIdentifier(itemIdentifier) else {
             completionHandler(NSFileProviderError(.noSuchItem))
-            return
-        }
-            
-        guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
-            completionHandler( NSFileProviderError(.noSuchItem))
             return
         }
         
@@ -246,19 +236,28 @@ extension FileProviderExtension {
                 if errorCode == 0 && account == metadata.account {
                     // Change DB
                     metadata.favorite = favorite
-                    _ = NCManageDatabase.sharedInstance.addMetadata(metadata)
+                    guard let metadataUpdate = NCManageDatabase.sharedInstance.addMetadata(metadata) else {
+                        completionHandler(nil, NSFileProviderError(.noSuchItem))
+                        return
+                    }
+                    let item = FileProviderItem(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier)
                     
-                    // Signal update/delete
-//                    let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
-//                    completionHandler(item, nil)
+                    fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+                    fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+                    fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
+
+                    completionHandler(item, nil)
                     
                 } else {
                     // Errore, remove from listFavoriteIdentifierRank
                     fileProviderData.sharedInstance.listFavoriteIdentifierRank.removeValue(forKey: itemIdentifier.rawValue)
+                    let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
                     
-                    // Signal update/delete
-//                    let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
-//                    completionHandler(item, NSFileProviderError(.serverUnreachable))
+                    fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+                    fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+                    fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
+                    
+                    completionHandler(item, NSFileProviderError(.serverUnreachable))
                 }
             })
         }
@@ -280,6 +279,7 @@ extension FileProviderExtension {
         }
         
         let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+        
         fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
         fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
         fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
