@@ -73,6 +73,7 @@ class FileProviderExtension: NSFileProviderExtension {
         var maybeEnumerator: NSFileProviderEnumerator? = nil
         
         // Check account
+        /*
         if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
             if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
                 throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
@@ -86,6 +87,9 @@ class FileProviderExtension: NSFileProviderExtension {
                 }
             }
         }
+        */
+        _ = fileProviderData.sharedInstance.setupActiveAccount(domain: nil)
+
 
         if (containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer) {
             maybeEnumerator = FileProviderEnumerator(enumeratedItemIdentifier: containerItemIdentifier)
@@ -238,9 +242,6 @@ class FileProviderExtension: NSFileProviderExtension {
                 
                 guard let metadataUpdate = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
                 NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdate)
-                
-                // Signal update/delete
-                _ = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
                 
                 completionHandler(nil)
 

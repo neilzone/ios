@@ -63,8 +63,11 @@ extension FileProviderExtension {
                     return
                 }
                 
-                // Signal update/delete
-                let item = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
+                let item = FileProviderItem(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier)
+                fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+                fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+                fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
+              
                 completionHandler(item, nil)
                 
             } else {
@@ -102,8 +105,6 @@ extension FileProviderExtension {
                 NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
                 NCManageDatabase.sharedInstance.deleteLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
                 
-                // Signal update/delete
-                _ = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: true, update: false)
                 completionHandler(nil)
 
             } else {
@@ -151,8 +152,7 @@ extension FileProviderExtension {
                     return
                 }
                 
-                // Signal update/delete
-                let item = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
+                let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
                 completionHandler(item, nil)
                 
             } else {
@@ -207,8 +207,7 @@ extension FileProviderExtension {
                     return
                 }
                 
-                // Signal update/delete
-                let item = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
+                let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
                 completionHandler(item, nil)
                 
             } else {
@@ -250,16 +249,16 @@ extension FileProviderExtension {
                     _ = NCManageDatabase.sharedInstance.addMetadata(metadata)
                     
                     // Signal update/delete
-                    let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
-                    completionHandler(item, nil)
+//                    let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
+//                    completionHandler(item, nil)
                     
                 } else {
                     // Errore, remove from listFavoriteIdentifierRank
                     fileProviderData.sharedInstance.listFavoriteIdentifierRank.removeValue(forKey: itemIdentifier.rawValue)
                     
                     // Signal update/delete
-                    let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
-                    completionHandler(item, NSFileProviderError(.serverUnreachable))
+//                    let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
+//                    completionHandler(item, NSFileProviderError(.serverUnreachable))
                 }
             })
         }
@@ -280,8 +279,11 @@ extension FileProviderExtension {
             return
         }
         
-        // Signal update/delete
-        let item =  fileProviderData.sharedInstance.fileProviderSignal(metadata: metadata, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
+        let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+        fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+        fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+        fileProviderData.sharedInstance.signalEnumerator(for: [item.parentItemIdentifier, .workingSet])
+
         completionHandler(item, nil)
     }
     
